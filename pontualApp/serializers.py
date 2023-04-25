@@ -1,3 +1,4 @@
+import os
 from rest_framework import serializers
 from rest_framework.reverse import reverse
 from django.utils import timezone
@@ -66,9 +67,23 @@ class LoginSerializer(serializers.Serializer):
     password = serializers.CharField()
 
 class PontoSerializer(serializers.HyperlinkedModelSerializer):
+    dados = serializers.FileField(write_only=True)
+    
     class Meta:
         model = Ponto
         fields = ['url', 'dados', 'data']
+
+    def create(self, validated_data):
+        # substitui sempre o último arquivo de ponto pelo atual
+        os.system('rm -rf ./media')
+        if Ponto.objects.all():
+            Ponto.objects.last().delete()
+        ponto = Ponto(
+            dados = validated_data['dados']
+        )
+        ponto.save()
+        return ponto
+
 
 class SugestaoSerializer(serializers.HyperlinkedModelSerializer):
     criado_por = serializers.ReadOnlyField(source='criado_por.username')

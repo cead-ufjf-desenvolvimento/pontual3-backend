@@ -15,11 +15,12 @@ Pull/clone this repository and get started as follows.
 5. Set your **script** file in `scripts/config.json`, for example:
 ```json
     {
-        "SECRET_KEY": "your-secret-key", 
-        "ENVIRONMENT": "development",
-        "TIME_ZONE": "UTC",
-        "LANGUAGE_CODE": "en-us"
+        "SECRET_KEY": "your-secret-key",
+        "LANGUAGE_CODE": "pt-br",
+        "TIME_ZONE": "America/Sao_Paulo",
+        "ENVIRONMENT": "development"
     }
 ```
 6. Make (after configure your database) the initial migration using `python3 manage.py migrate`
 7. Rename your project using `python3 manage.py renameproject.py djangoBoilerplate <new_project_name>`
+8. Run the server using `python3 manage.py runserver`.
