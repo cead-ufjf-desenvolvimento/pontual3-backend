@@ -143,6 +143,9 @@ class JustificativaAdicionalViewSet(viewsets.ModelViewSet):
         serializer = JustificativaAdicionalSerializer(data=request.data, context={'request': request})
 
 class AFDViewSet(viewsets.ViewSet):
+    """
+    GET: "/?mes=mm&?ano=yyyy" to retrieve data
+    """
     def list(self, request):
         if not Usuario.objects.filter(pis=request.user.username):
             error_message = {'user_error': 'Usuário não corresponde a nenhum cadastrado no AFD'}
