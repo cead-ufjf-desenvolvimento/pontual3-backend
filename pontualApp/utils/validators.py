@@ -5,15 +5,25 @@ from rest_framework import status
 def is_only_digit(value: str) -> bool:
     value = ''.join(val for val in value if val.isdigit())
     if len(value) != 12:
-        raise ValidationError(_('Esse campo aceita apenas números'), code=status.HTTP_400)
+        raise ValidationError(_('Esse campo aceita apenas números'), code=status.HTTP_400_BAD_REQUEST)
     
-def validate_pis(value: str) -> bool:
-    weight_array = [3, 2, 9, 8, 7, 6, 5, 4, 3, 2]
-    acc = 0
-    value = value[1:]
-    for i in range(len(weight_array)):
-        acc += int(value[i]) * weight_array[i]
-    remainder = acc % 11
-    result = 11 - remainder
-    if result != int(value[-1]):
-        raise ValidationError(_('PIS inválido'), code=status.HTTP_400)
+def validate_pis(value):
+    pis = value[1:]
+    # Remove any non-digit characters
+    pis = ''.join(filter(str.isdigit, pis))
+    
+    # Check if the length is correct
+    if len(pis) != 11:
+        return False
+    
+    # Calculate the check digit
+    total = 0
+    for i in range(0, 10):
+        total += int(pis[i]) * (10 - i)
+    check_digit = 11 - (total % 11)
+    if check_digit == 10 or check_digit == 11:
+        check_digit = 0
+    
+    # Compare the calculated check digit with the last digit of the PIS
+    if check_digit != int(pis[10]):
+        raise ValidationError(_('PIS inválido'), code=status.HTTP_400_BAD_REQUEST)
