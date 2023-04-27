@@ -146,6 +146,9 @@ class AFDViewSet(viewsets.ViewSet):
     """
     GET: "/?mes=mm&?ano=yyyy" to retrieve data
     """
+
+    permission_classes = [permissions.IsAuthenticated]
+
     def list(self, request):
         if not Usuario.objects.filter(pis=request.user.username):
             error_message = {'user_error': 'Usuário não corresponde a nenhum cadastrado no AFD'}
