@@ -44,12 +44,14 @@ def checkTotal(item):
 class UsuarioViewSet(viewsets.ModelViewSet):
     queryset = Usuario.objects.all()
     serializer_class = UsuarioSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
     # Permite que apenas administradores vejam a lista de usuários
     def list(self, request, *args, **kwargs):
-        if not request.user.is_staff:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        queryset = self.filter_queryset(self.get_queryset())
+        if(request.user.is_staff):
+            queryset = self.filter_queryset(self.get_queryset())
+        else:
+            queryset = self.filter_queryset(self.get_queryset()).filter(pis=request.user.username)
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
     
