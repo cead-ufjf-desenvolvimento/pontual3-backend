@@ -252,17 +252,11 @@ class AFDViewSet(viewsets.ViewSet):
                 # apaga a lista do dia
                 current_result = {}
 
-        # vetor de dias para justificar
-        days_to_justify = []
-
         for item in results:
             # vetor informando os dias a serem justificados
             if not checkTotal(item)[2]:
-                days_to_justify.append(item['data'])
+                item['status'] = 1
+            else:
+                item['status'] = 0
 
-        context = {
-            'results': results,
-            'days_to_justify': days_to_justify,
-        }
-
-        return Response(context)
+        return Response(results)
