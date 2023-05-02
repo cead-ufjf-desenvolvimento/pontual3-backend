@@ -1,3 +1,4 @@
+from datetime import datetime
 import math
 from django.contrib.auth import authenticate
 from rest_framework import viewsets, permissions, status
@@ -253,8 +254,14 @@ class AFDViewSet(viewsets.ViewSet):
                 current_result = {}
 
         for item in results:
+            date_object = datetime.strptime(item['data'], '%d/%m/%Y')
+            new_date_string = date_object.strftime('%Y-%m-%d')
+            
             # vetor informando os dias a serem justificados
-            if not checkTotal(item)[2]:
+            if Justificativa.objects.filter(usuario=request.user.pk).filter(data=new_date_string):
+                item['justificativa'] = Justificativa.objects.filter(usuario=request.user.pk).get(data=new_date_string).justificativa
+                item['status'] = 2
+            elif not checkTotal(item)[2]:
                 item['status'] = 1
             else:
                 item['status'] = 0
