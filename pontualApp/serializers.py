@@ -10,7 +10,7 @@ class UsuarioSerializer(serializers.HyperlinkedModelSerializer):
     
     class Meta:
         model = Usuario
-        fields = ['url', 'nome', 'email', 'cargo', 'setor', 'pis', 'password']
+        fields = ['url', 'id', 'nome', 'email', 'cargo', 'setor', 'pis', 'password']
 
     def create(self, validated_data):
         user = Usuario.objects.create(
@@ -35,7 +35,7 @@ class JustificativaSerializer(serializers.HyperlinkedModelSerializer):
     
     class Meta:
         model = Justificativa
-        fields = ['url', 'data', 'justificativa', 'usuario']
+        fields = ['url', 'id', 'data', 'justificativa', 'usuario']
 
 class JustificativaAdicionalSerializer(serializers.HyperlinkedModelSerializer):
     criado_por = serializers.HyperlinkedRelatedField(view_name='usuario-detail', read_only=True)

@@ -88,6 +88,14 @@ class JustificativaViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
     
+    def list(self, request, *args, **kwargs):
+        if(request.GET.get('usuario') and request.GET.get('data')):
+            queryset = self.filter_queryset(self.get_queryset()).filter(usuario=request.GET.get('usuario')).filter(data=request.GET.get('data'))
+        else:
+            queryset = self.filter_queryset(self.get_queryset())
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+    
 class PontoViewSet(viewsets.ModelViewSet):
     queryset = Ponto.objects.all()
     serializer_class = PontoSerializer
