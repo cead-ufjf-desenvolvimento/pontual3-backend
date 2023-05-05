@@ -1,10 +1,12 @@
-from datetime import datetime
+import calendar
+from datetime import datetime, date
 import math
 from django.contrib.auth import authenticate
 from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from django.utils import timezone
+from django.db.models import Q
 
 from pontualApp.models import Justificativa, JustificativaAdicional, Ponto, Sugestao, Usuario
 from pontualApp.serializers import JustificativaAdicionalSerializer, JustificativaSerializer, LoginSerializer, PontoSerializer, SugestaoSerializer, UsuarioSerializer
@@ -152,6 +154,19 @@ class JustificativaAdicionalViewSet(viewsets.ModelViewSet):
     # Passa o context para o serializer
     def post(self, request):
         serializer = JustificativaAdicionalSerializer(data=request.data, context={'request': request})
+
+    def list(self, request, *args, **kwargs):
+        if(request.GET.get('ano') and request.GET.get('mes')):
+            ano = int(request.GET.get('ano'))
+            mes = int(request.GET.get('mes'))
+            start_date = date(ano, mes, 1)
+            _, last_day = calendar.monthrange(ano, mes)
+            end_date = date(ano, mes, last_day)
+            queryset = self.filter_queryset(self.get_queryset()).filter(Q(justificativa__data__gte=start_date) & Q(justificativa__data__lte=end_date))
+        else:
+            queryset = self.filter_queryset(self.get_queryset())
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
 class AFDViewSet(viewsets.ViewSet):
     """

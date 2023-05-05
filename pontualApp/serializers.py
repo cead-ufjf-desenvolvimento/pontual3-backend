@@ -40,17 +40,29 @@ class JustificativaSerializer(serializers.HyperlinkedModelSerializer):
 class JustificativaAdicionalSerializer(serializers.HyperlinkedModelSerializer):
     criado_por = serializers.HyperlinkedRelatedField(view_name='usuario-detail', read_only=True)
     justificativa = serializers.HyperlinkedRelatedField(view_name='justificativa-detail', read_only=True)
-    descricao = serializers.CharField(write_only=True)
+    justificativa_justificativa = serializers.CharField(write_only=True)
     data = serializers.DateField(write_only=True)
+    justificativa_descricao = serializers.CharField(read_only=True, source='justificativa.justificativa')
+    justificativa_data = serializers.DateField(read_only=True, source='justificativa.data')
+    justificativa_criado_por = serializers.CharField(read_only=True, source='justificativa.usuario')
 
     class Meta:
         model = JustificativaAdicional
-        fields = ['url', 'justificativa', 'criado_por', 'descricao', 'data']
+        fields = [
+            'url', 
+            'justificativa', 
+            'criado_por', 
+            'justificativa_justificativa', 
+            'data', 
+            'justificativa_descricao', 
+            'justificativa_data',
+            'justificativa_criado_por',
+        ]
 
     def create(self, validated_data):
         request = self.context.get('request')
         justificativa = Justificativa(
-            justificativa=validated_data['descricao'],
+            justificativa=validated_data['justificativa_justificativa'],
             data=validated_data['data'],
             usuario=request.user
         )
