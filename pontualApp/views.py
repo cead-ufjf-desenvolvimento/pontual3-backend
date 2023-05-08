@@ -9,6 +9,7 @@ from django.utils import timezone
 from django.db.models import Q
 
 from pontualApp.models import Justificativa, JustificativaAdicional, Ponto, Sugestao, Usuario
+from pontualApp.permissions import IsAuthenticatedOrWriteOnly
 from pontualApp.serializers import JustificativaAdicionalSerializer, JustificativaSerializer, LoginSerializer, PontoSerializer, SugestaoSerializer, UsuarioSerializer
 
 
@@ -47,7 +48,7 @@ def checkTotal(item):
 class UsuarioViewSet(viewsets.ModelViewSet):
     queryset = Usuario.objects.all()
     serializer_class = UsuarioSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticatedOrWriteOnly]
 
     # Permite que apenas administradores vejam a lista de usuários
     def list(self, request, *args, **kwargs):
