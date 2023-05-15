@@ -10,7 +10,7 @@ from django.db.models import Q
 
 from pontualApp.models import Justificativa, JustificativaAdicional, Ponto, Sugestao, Usuario
 from pontualApp.permissions import IsAuthenticatedOrWriteOnly
-from pontualApp.serializers import JustificativaAdicionalSerializer, JustificativaSerializer, LoginSerializer, PontoSerializer, SugestaoSerializer, UsuarioSerializer
+from pontualApp.serializers import JustificativaAdicionalSerializer, JustificativaSerializer, LoginSerializer, MultiJustificativaSerializer, PontoSerializer, SugestaoSerializer, UsuarioSerializer
 
 
 def checkTotal(item):
@@ -168,6 +168,10 @@ class JustificativaAdicionalViewSet(viewsets.ModelViewSet):
             queryset = self.filter_queryset(self.get_queryset())
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+    
+class MultiJustificativasViewSet(viewsets.ModelViewSet):
+    queryset = JustificativaAdicional.objects.all()
+    serializer_class = MultiJustificativaSerializer
 
 class AFDViewSet(viewsets.ViewSet):
     """

@@ -10,7 +10,7 @@ class UsuarioSerializer(serializers.HyperlinkedModelSerializer):
     
     class Meta:
         model = Usuario
-        fields = ['url', 'id', 'nome', 'email', 'cargo', 'setor', 'pis', 'password']
+        fields = ['url', 'id', 'nome', 'email', 'cargo', 'setor', 'pis', 'password', 'is_superuser']
 
     def create(self, validated_data):
         user = Usuario.objects.create(
@@ -73,6 +73,28 @@ class JustificativaAdicionalSerializer(serializers.HyperlinkedModelSerializer):
         )
         justificativa_adicional.save()
         return justificativa_adicional
+
+class MultiJustificativaSerializer(serializers.Serializer):
+    justificativa = serializers.CharField(write_only=True)
+    data = serializers.DateField(write_only=True)
+    funcionarios = serializers.ListField(child=serializers.IntegerField(), write_only=True)
+
+    def create(self, validated_data):
+        objects = []
+        for funcionario_id in validated_data['funcionarios']:
+            new_justificativa = Justificativa.objects.create(
+                data=validated_data['data'],
+                justificativa=validated_data['justificativa'],
+                usuario=Usuario.objects.get(id=funcionario_id)
+            )
+            new_justificativa.save()
+            justificativa_adicional = JustificativaAdicional(
+                justificativa=new_justificativa,
+                criado_por=Usuario.objects.get(nome='admin')
+            )
+            justificativa_adicional.save()
+            objects.append(new_justificativa)
+        return objects
 
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField()
