@@ -1,9 +1,7 @@
 bpython==0.24
-Brlapi==0.8.2
 Django==4.2
 django-cors-headers==3.14.0
 djangorestframework==3.14.0
 requests==2.25.1
-virtualenv==20.4.0+ds
-virtualenv-clone==0.3.0
-virtualenvwrapper==4.8.4
+validate-docbr==1.10.0
+python-dotenv==1.0.0
