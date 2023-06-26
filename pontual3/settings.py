@@ -65,7 +65,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-if os.getenv('CORS_ORIGIN_ALLOW_ALL'):
+if os.getenv('CORS_ORIGIN_ALLOW_ALL') == 'True':
     CORS_ORIGIN_ALLOW_ALL = True
 else:
     CORS_ALLOWED_ORIGINS = [os.getenv('CORS_ALLOWED_ORIGINS')]
@@ -95,12 +95,24 @@ WSGI_APPLICATION = 'pontual3.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+if os.getenv('ENVIRONMENT') == 'development':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME'     : os.getenv('DB_NAME'),
+            'USER'     : os.getenv('DB_USER'),
+            'PASSWORD' : os.getenv('DB_PASSWORD'),
+            'HOST'     : os.getenv('HOST'),
+            'PORT'     : os.getenv('PORT'),
+        }
+    }
 
 
 # Password validation

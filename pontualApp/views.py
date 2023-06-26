@@ -149,7 +149,7 @@ class JustificativaAdicionalViewSet(viewsets.ModelViewSet):
     # retorna apenas as justificativas adicionais do usuário em questão
     def get_queryset(self):
         queryset = super().get_queryset()
-        queryset = queryset.filter(criado_por=self.request.user)
+        queryset = queryset.filter(justificativa__usuario=self.request.user)
         return queryset
     
     # Passa o context para o serializer
