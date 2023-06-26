@@ -9,6 +9,8 @@ router.register(r'login', views.LoginViewSet, basename='login')
 router.register(r'ponto', views.PontoViewSet, basename='ponto')
 router.register(r'sugestao', views.SugestaoViewSet, basename='sugestao')
 router.register(r'justificativaadicional', views.JustificativaAdicionalViewSet, basename='justificativaadicional')
+router.register(r'multijustificativa', views.MultiJustificativasViewSet, basename='multijustificativa')
+router.register(r'afd', views.AFDViewSet, basename='afd')
 
 urlpatterns = [
     path('', include(router.urls)),

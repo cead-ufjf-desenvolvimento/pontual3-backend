@@ -1,3 +1,4 @@
+import os
 from rest_framework import serializers
 from rest_framework.reverse import reverse
 from django.utils import timezone
@@ -9,7 +10,7 @@ class UsuarioSerializer(serializers.HyperlinkedModelSerializer):
     
     class Meta:
         model = Usuario
-        fields = ['url', 'nome', 'email', 'cargo', 'setor', 'pis', 'password']
+        fields = ['url', 'id', 'nome', 'email', 'cargo', 'setor', 'pis', 'password', 'is_superuser']
 
     def create(self, validated_data):
         user = Usuario.objects.create(
@@ -34,22 +35,34 @@ class JustificativaSerializer(serializers.HyperlinkedModelSerializer):
     
     class Meta:
         model = Justificativa
-        fields = ['url', 'data', 'justificativa', 'usuario']
+        fields = ['url', 'id', 'data', 'justificativa', 'usuario']
 
 class JustificativaAdicionalSerializer(serializers.HyperlinkedModelSerializer):
     criado_por = serializers.HyperlinkedRelatedField(view_name='usuario-detail', read_only=True)
     justificativa = serializers.HyperlinkedRelatedField(view_name='justificativa-detail', read_only=True)
-    descricao = serializers.CharField(write_only=True)
+    justificativa_justificativa = serializers.CharField(write_only=True)
     data = serializers.DateField(write_only=True)
+    justificativa_descricao = serializers.CharField(read_only=True, source='justificativa.justificativa')
+    justificativa_data = serializers.DateField(read_only=True, source='justificativa.data')
+    justificativa_criado_por = serializers.CharField(read_only=True, source='justificativa.usuario')
 
     class Meta:
         model = JustificativaAdicional
-        fields = ['url', 'justificativa', 'criado_por', 'descricao', 'data']
+        fields = [
+            'url', 
+            'justificativa', 
+            'criado_por', 
+            'justificativa_justificativa', 
+            'data', 
+            'justificativa_descricao', 
+            'justificativa_data',
+            'justificativa_criado_por',
+        ]
 
     def create(self, validated_data):
         request = self.context.get('request')
         justificativa = Justificativa(
-            justificativa=validated_data['descricao'],
+            justificativa=validated_data['justificativa_justificativa'],
             data=validated_data['data'],
             usuario=request.user
         )
@@ -61,14 +74,50 @@ class JustificativaAdicionalSerializer(serializers.HyperlinkedModelSerializer):
         justificativa_adicional.save()
         return justificativa_adicional
 
+class MultiJustificativaSerializer(serializers.Serializer):
+    justificativa = serializers.CharField(write_only=True)
+    data = serializers.DateField(write_only=True)
+    funcionarios = serializers.ListField(child=serializers.IntegerField(), write_only=True)
+
+    def create(self, validated_data):
+        objects = []
+        for funcionario_id in validated_data['funcionarios']:
+            new_justificativa = Justificativa.objects.create(
+                data=validated_data['data'],
+                justificativa=validated_data['justificativa'],
+                usuario=Usuario.objects.get(id=funcionario_id)
+            )
+            new_justificativa.save()
+            justificativa_adicional = JustificativaAdicional(
+                justificativa=new_justificativa,
+                criado_por=Usuario.objects.get(nome='admin')
+            )
+            justificativa_adicional.save()
+            objects.append(new_justificativa)
+        return objects
+
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField()
     password = serializers.CharField()
 
 class PontoSerializer(serializers.HyperlinkedModelSerializer):
+    dados = serializers.FileField(write_only=True)
+    
     class Meta:
         model = Ponto
         fields = ['url', 'dados', 'data']
+
+    def create(self, validated_data):
+        # substitui sempre o último arquivo de ponto pelo atual
+        os.system('rm -rf ./media')
+        if Ponto.objects.all():
+            Ponto.objects.last().delete()
+        ponto = Ponto(
+            dados = validated_data['dados']
+        )
+        ponto.save()
+        return ponto
+
 
 class SugestaoSerializer(serializers.HyperlinkedModelSerializer):
     criado_por = serializers.ReadOnlyField(source='criado_por.username')

@@ -23,7 +23,7 @@ class Justificativa(models.Model):
     
 class JustificativaAdicional(models.Model):
     justificativa = models.OneToOneField(Justificativa, on_delete=models.CASCADE)
-    criado_por = models.ForeignKey(Usuario, on_delete=models.SET_NULL, null=True)
+    criado_por = models.ForeignKey(Usuario, on_delete=models.CASCADE, null=True)
 
     def __str__(self):
         return "Justificativa Adicional: " + self.justificativa.data.strftime("%d/%m/%Y")
